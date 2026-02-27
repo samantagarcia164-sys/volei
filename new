@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vôlei: Controle de Quadra</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-4 font-sans">
+
+    <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
+        <h1 class="text-2xl font-bold text-blue-600 mb-4 text-center">🏐 Lista do Vôlei</h1>
+        
+        <div class="flex gap-2 mb-6">
+            <input type="text" id="nomeJogador" placeholder="Nome do jogador" 
+                class="flex-1 border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <button onclick="adicionarJogador()" 
+                class="bg-blue-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-600">
+                +
+            </button>
+        </div>
+
+        <ul id="listaJogadores" class="space-y-3">
+            </ul>
+
+        <div class="mt-6 pt-4 border-t border-gray-200">
+            <p class="text-sm text-gray-500 text-center">Os dados ficam salvos apenas neste navegador.</p>
+        </div>
+    </div>
+
+    <script>
+        let jogadores = JSON.parse(localStorage.getItem('jogadoresVolei')) || [];
+
+        function renderizar() {
+            const lista = document.getElementById('listaJogadores');
+            lista.innerHTML = '';
+
+            jogadores.forEach((j, index) => {
+                const item = document.createElement('li');
+                item.className = `flex justify-between items-center p-3 rounded-lg border ${j.pago ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`;
+                
+                item.innerHTML = `
+                    <span class="font-medium ${j.pago ? 'text-green-800' : 'text-red-800'}">${j.nome}</span>
+                    <div class="flex gap-2">
+                        <button onclick="togglePix(${index})" 
+                            class="text-xs px-3 py-1 rounded-full font-bold uppercase ${j.pago ? 'bg-green-500 text-white' : 'bg-red-400 text-white'}">
+                            ${j.pago ? 'PIX OK' : 'Pendente'}
+                        </button>
+                        <button onclick="removerJogador(${index})" class="text-gray-400 hover:text-red-600">✕</button>
+                    </div>
+                `;
+                lista.appendChild(item);
+            });
+            
+            localStorage.setItem('jogadoresVolei', JSON.stringify(jogadores));
+        }
+
+        function adicionarJogador() {
+            const input = document.getElementById('nomeJogador');
+            if (input.value.trim() !== '') {
+                jogadores.push({ nome: input.value, pago: false });
+                input.value = '';
+                renderizar();
+            }
+        }
+
+        function togglePix(index) {
+            jogadores[index].pago = !jogadores[index].pago;
+            renderizar();
+        }
+
+        function removerJogador(index) {
+            jogadores.splice(index, 1);
+            renderizar();
+        }
+
+        renderizar();
+    </script>
+</body>
+</html>
